@@ -1,0 +1,61 @@
+from fastmcp import FastMCP
+
+
+
+mcp=FastMCP("calculation")
+
+
+@mcp.tool()
+def Math(a:float,b:float,operation:str):
+    """
+    add, subtract, multiply and divide two numbers.
+    Args:
+        a (float): first number
+        b (float): second number
+        operation (str): operation to perform, one of 'add', 'subtract', 'multiply', 'divide'
+    Returns:
+        float: result of the operation
+    Raises:
+        ValueError: if operation is not one of the allowed values
+    """
+    print("Tool run")
+    if operation == 'add':
+        return a + b
+    elif operation == 'subtract':
+        return a - b
+    elif operation == 'multiply':
+        return a * b
+    elif operation == 'divide':
+        if b == 0:
+            raise ValueError("Cannot divide by zero")
+        return a / b
+    else:
+        raise ValueError("Invalid operation. Allowed values are: 'add', 'subtract', 'multiply', 'divide'")
+
+
+
+
+@mcp.prompt()
+def Prompt(Operation:str):
+    """ Generate the prompt for the Math tool."""
+    return f"Perform the operation: {Operation}. You can use the Math tool to do this. The operation should be one of 'add', 'subtract', 'multiply', 'divide'. and in the end print work has been done by the tool."
+
+
+
+@mcp.resource("guide://math-operations")
+def math_operations_text() -> str:
+    """
+    Reads a plain text file with math operation descriptions and returns its content.
+    """
+    file_path = "u.txt"  
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            return f.read()
+    except Exception as e:
+        return f"Error loading math operations guide: {str(e)}"
+
+
+
+
+if __name__=="__main__":
+    mcp.run(transport="sse")
