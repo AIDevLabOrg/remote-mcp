@@ -1,6 +1,8 @@
 from fastmcp import FastMCP
 import os
 import uvicorn
+from starlette.requests import Request
+from starlette.responses import JSONResponse
 
 # Get port from environment variable for Digital Ocean compatibility
 port = int(os.environ.get("PORT", 9783))
@@ -8,10 +10,10 @@ port = int(os.environ.get("PORT", 9783))
 # Create FastMCP instance
 mcp = FastMCP("calculation")
 
-# Add a health check endpoint to the underlying FastAPI app
-@mcp.http_app.get("/health")
-async def health_check():
-    return {"status": "healthy"}
+# Add a health check endpoint using custom_route
+@mcp.custom_route("/health", methods=["GET"])
+async def health_check(request: Request) -> JSONResponse:
+    return JSONResponse({"status": "healthy"})
 
 @mcp.tool()
 def Math(a:float,b:float,operation:str):
@@ -39,9 +41,6 @@ def Math(a:float,b:float,operation:str):
         return a / b
     else:
         raise ValueError("Invalid operation. Allowed values are: 'add', 'subtract', 'multiply', 'divide'")
-
-
-
 
 @mcp.prompt()
 def Prompt(Operation:str):
