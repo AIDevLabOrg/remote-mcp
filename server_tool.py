@@ -1,18 +1,21 @@
 from fastmcp import FastMCP
 import os
 import uvicorn
-from starlette.requests import Request
+from fastapi import FastAPI
 from starlette.responses import JSONResponse
 
 # Get port from environment variable for Digital Ocean compatibility
 port = int(os.environ.get("PORT", 9783))
 
-# Create FastMCP instance
+# Create FastAPI app
+app = FastAPI()
+
+# Create FastMCP instance and mount it to the FastAPI app
 mcp = FastMCP("calculation")
 
-# Add a health check endpoint using custom_route
-@mcp.custom_route("/health", methods=["GET"])
-async def health_check(request: Request) -> JSONResponse:
+# Add a health check endpoint
+@app.get("/health")
+async def health_check():
     return JSONResponse({"status": "healthy"})
 
 @mcp.tool()
@@ -61,9 +64,9 @@ def math_operations_text() -> str:
     except Exception as e:
         return f"Error loading math operations guide: {str(e)}"
 
-
-
+# Mount the MCP app to the FastAPI app
+app.mount("/sse", mcp.asgi_app())
 
 if __name__=="__main__":
-    # Run the FastMCP server with SSE transport
-    mcp.run(transport="sse", host="0.0.0.0", port=port)
+    # Run the FastAPI app with uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=port)
