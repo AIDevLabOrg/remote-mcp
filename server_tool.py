@@ -1,10 +1,30 @@
 from fastmcp import FastMCP
 import os
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 # Get port from environment variable for Digital Ocean compatibility
 port = int(os.environ.get("PORT", 9783))
 
-mcp=FastMCP("calculation")
+# Create FastMCP instance
+mcp = FastMCP("calculation")
+
+# Get the underlying FastAPI app for additional configuration
+app = mcp.get_app()
+
+# Add CORS middleware to allow all origins
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Add a health check endpoint
+@app.get("/")
+def health_check():
+    return {"status": "healthy", "message": "MCP Server is running"}
 
 
 @mcp.tool()
