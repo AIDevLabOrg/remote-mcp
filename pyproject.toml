@@ -2,7 +2,7 @@
 name = "mcp-server"
 version = "0.1.0"
 description = "A simple MCP server using FastMCP and uv"
-dependencies = ["fastmcp","openai"]
+dependencies = ["fastmcp","openai","fastapi","uvicorn"]
 requires-python = ">=3.10"
 
 [build-system]
