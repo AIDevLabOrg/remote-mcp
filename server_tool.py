@@ -1,6 +1,5 @@
 from fastmcp import FastMCP
 import os
-from fastapi import FastAPI
 import uvicorn
 
 # Get port from environment variable for Digital Ocean compatibility
@@ -9,11 +8,8 @@ port = int(os.environ.get("PORT", 9783))
 # Create FastMCP instance
 mcp = FastMCP("calculation")
 
-# Get the underlying FastAPI app to add a health check endpoint
-app = mcp.get_app()
-
-# Add a health check endpoint
-@app.get("/health")
+# Add a health check endpoint to the underlying FastAPI app
+@mcp.http_app.get("/health")
 async def health_check():
     return {"status": "healthy"}
 
@@ -70,5 +66,5 @@ def math_operations_text() -> str:
 
 
 if __name__=="__main__":
-    # Use uvicorn to run the app directly instead of mcp.run for better control
-    uvicorn.run(app, host="0.0.0.0", port=port, log_level="info")
+    # Run the FastMCP server with SSE transport
+    mcp.run(transport="sse", host="0.0.0.0", port=port)
