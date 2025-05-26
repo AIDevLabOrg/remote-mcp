@@ -12,5 +12,5 @@ services:
     http_port: 9783
     health_check:
       http_path: /health
-      initial_delay_seconds: 10
-      period_seconds: 5
+      initial_delay_seconds: 30
+      period_seconds: 10

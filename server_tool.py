@@ -3,20 +3,21 @@ import os
 import uvicorn
 from fastapi import FastAPI
 from starlette.responses import JSONResponse
+import threading
 
 # Get port from environment variable for Digital Ocean compatibility
 port = int(os.environ.get("PORT", 9783))
 
-# Create FastAPI app
+# Create FastAPI app for health checks
 app = FastAPI()
 
-# Create FastMCP instance and mount it to the FastAPI app
+# Create FastMCP instance
 mcp = FastMCP("calculation")
 
 # Add a health check endpoint
 @app.get("/health")
 async def health_check():
-    return JSONResponse({"status": "healthy"})
+    return {"status": "healthy"}
 
 @mcp.tool()
 def Math(a:float,b:float,operation:str):
@@ -50,8 +51,6 @@ def Prompt(Operation:str):
     """ Generate the prompt for the Math tool."""
     return f"Perform the operation: {Operation}. You can use the Math tool to do this. The operation should be one of 'add', 'subtract', 'multiply', 'divide'. and in the end print work has been done by the tool."
 
-
-
 @mcp.resource("guide://math-operations")
 def math_operations_text() -> str:
     """
@@ -64,9 +63,15 @@ def math_operations_text() -> str:
     except Exception as e:
         return f"Error loading math operations guide: {str(e)}"
 
-# Mount the MCP app to the FastAPI app
-app.mount("/sse", mcp.asgi_app())
-
 if __name__=="__main__":
-    # Run the FastAPI app with uvicorn
+    # Run the MCP server in a separate thread
+    def run_mcp():
+        mcp.run(transport="sse", host="0.0.0.0", port=9784)
+    
+    # Start the MCP server thread
+    mcp_thread = threading.Thread(target=run_mcp)
+    mcp_thread.daemon = True
+    mcp_thread.start()
+    
+    # Run the FastAPI app in the main thread
     uvicorn.run(app, host="0.0.0.0", port=port)
