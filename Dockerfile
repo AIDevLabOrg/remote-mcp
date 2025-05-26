@@ -7,8 +7,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-ENV PORT=8000
+ENV PORT=9783
 
-EXPOSE 8000
+EXPOSE 9783
 
 CMD ["python", "server_tool.py"]

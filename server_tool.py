@@ -2,7 +2,7 @@ from fastmcp import FastMCP
 import os
 
 # Get port from environment variable for Digital Ocean compatibility
-port = int(os.environ.get("PORT", 8000))
+port = int(os.environ.get("PORT", 9783))
 
 mcp=FastMCP("calculation")
 
