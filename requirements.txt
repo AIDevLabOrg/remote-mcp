@@ -1,5 +1,6 @@
 # This file was manually updated to include FastAPI and related dependencies:
 #    Original: uv pip compile pyproject.toml
+# Fixed version conflicts
 fastapi==0.110.0
     # via mcp-server (pyproject.toml)
 annotated-types==0.7.0
@@ -84,7 +85,7 @@ sniffio==1.3.1
     #   openai
 sse-starlette==2.3.5
     # via mcp
-starlette==0.46.2
+starlette==0.36.3
     # via
     #   mcp
     #   sse-starlette
